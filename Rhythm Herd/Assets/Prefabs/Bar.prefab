@@ -88,4 +88,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   magnitude: 400
-  destroyDistance: 0.1
+  destroyDistance: 3
