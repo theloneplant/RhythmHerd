@@ -2,7 +2,7 @@
 
 public class GameManager : MonoBehaviour {
 	[SerializeField] private CameraController camera;
-	[SerializeField] private PlayerController controller;
+	[SerializeField] private Herd controller;
 	[SerializeField] private float offset;
 	[SerializeField] private int bpm;
 
@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		controller = GetComponent<PlayerController> ();
+		controller = GetComponent<Herd> ();
 		startTime = Time.time;
 	}
 	
