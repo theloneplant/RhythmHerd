@@ -1,27 +1,37 @@
 ﻿using UnityEngine;
-using UnityEngine.Assertions;
 
 public class Herd : MonoBehaviour
 {
-    public GridFromChildren grid;
+    [SerializeField] private HerdMember memberPrefab = null;
+    [SerializeField] private int memberCount = 6;
+    [SerializeField] private GridFromChildren grid = null;
+    [SerializeField] private float herdRadius = 1f;
+    [SerializeField] private float moveSpeed = 1f;
+    [SerializeField] private float minimumSeparation = 0.1f;
 
-    private HerdMember leader;
-    private int memberCount;
+    private HerdMember[] members;
+
+    private static float _followSpeed;
+    public static float FollowSpeed => 1f - 1f / (_followSpeed + 1f);
 
     private void Start()
     {
-        HerdMember[] members = Members();
-        memberCount = members.Length;
-        leader = members[0];
-        for (int i = 0; i < members.Length; i++)
+        members = new HerdMember[memberCount];
+        _followSpeed = moveSpeed;
+        for (int i = 0; i < memberCount; i++)
         {
-            HerdMember member = members[i];
-            if (i + 1 < members.Length)
+            members[i] = Instantiate(memberPrefab, transform);
+        }
+        members[0].GetComponent<MeshRenderer>().material.color = Color.red;
+        members[0].FollowModifier = 1f;
+        for (int i = 1; i < memberCount; i++)
+        {
+            var offset = Vector2.zero;
+            while (ClosestMember(offset) < minimumSeparation)
             {
-                member.next = members[i + 1];
+                offset = Random.insideUnitCircle * herdRadius;
             }
-            member.Position = new Vector2Int { x = i, };
-            member.GetComponent<MeshRenderer>().material.color = Random.ColorHSV();
+            members[i].Offset = offset;
         }
     }
 
@@ -30,78 +40,26 @@ public class Herd : MonoBehaviour
         Vector2Int direction = InputDirection();
         if (direction != Vector2Int.zero)
         {
-            Vector2Int destination = leader.Position + direction;
-            if (!HitsTail(destination) && !HitsObject(destination))
-            {
-                leader.Follow(destination);
-            }
-        }
-
-        // tmp
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            //KillMember(0);
-            KillRandomMember();
+            //Leader.Move(InputDirection());
+            HerdMember.Target += direction;
         }
     }
 
-    private bool HitsObject(Vector2Int destination)
+    private float ClosestMember(Vector2 point)
     {
-        if (grid != null)
+        float closest = Mathf.Infinity;
+        foreach (HerdMember member in members)
         {
-            return grid.Grid.GetCell(destination);
+            float distance = Vector2.Distance(member.Offset, point);
+            closest = Mathf.Min(closest, distance);
         }
-        return false;
+        return closest;
     }
 
-    public void KillRandomMember()
+    private void OnValidate()
     {
-        int index = Random.Range(0, memberCount);
-        KillMember(index);
-    }
-
-    private void KillMember(int index)
-    {
-        HerdMember previous = null;
-        HerdMember member = leader;
-        for (int i = 1; i < index - 1; i++)
-        {
-            previous = member;
-            member = member.next;
-        }
-        if (member.next != null)
-        {
-            if (previous != null)
-            {
-                previous.next = member.next;
-            }
-            else
-            {
-                leader = member.next;
-            }
-            member.next.Follow(member.Position);
-        }
-        member.Kill();
-        memberCount -= 1;
-    }
-
-    private bool HitsTail(Vector2Int destination)
-    {
-        bool hasHit = false;
-        HerdMember member = leader.next;
-        while (member != null)
-        {
-            hasHit |= member.Position == destination;
-            member = member.next;
-        }
-        return hasHit;
-    }
-
-    private HerdMember[] Members()
-    {
-        HerdMember[] members = GetComponentsInChildren<HerdMember>();
-        Assert.IsTrue(members.Length > 0, "No members in herd.");
-        return members;
+        _followSpeed = moveSpeed;
+        memberCount = memberCount > 0 ? memberCount : 1;
     }
 
     private Vector2Int InputDirection()
