@@ -6,6 +6,7 @@ public class Herd : MonoBehaviour
     [SerializeField] private HerdMember memberPrefab = null;
     [SerializeField] private HerdGatherer gatherer = null;
     [SerializeField] private LayerMask layerMask;
+    [SerializeField] private float moveDistance = 1f;
     [SerializeField] private int memberCount = 6;
     [SerializeField] private float herdRadius = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
@@ -36,8 +37,8 @@ public class Herd : MonoBehaviour
 
     private void Update()
     {
-        gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
-        Vector2 direction = InputDirection();
+        //gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
+        Vector2 direction = InputDirection() * moveDistance;
         if (direction != Vector2.zero)
         {
             DropMembers();
@@ -98,7 +99,7 @@ public class Herd : MonoBehaviour
         }
         else if (score < 0.75f)
         {
-            members.Last?.Value?.SetState(HerdMember.MemberState.Roam);
+            members.Last?.Value.SetState(HerdMember.MemberState.Roam);
             if (members.Count > 0)
             {
                 members.RemoveLast();
@@ -115,6 +116,11 @@ public class Herd : MonoBehaviour
             member?.Cheer();
             currentMember = currentMember?.Next;
         }
+    }
+
+    public void CheerAll()
+    {
+        Cheer(members.Count);
     }
 
     public void AddMember(HerdMember newMember)
