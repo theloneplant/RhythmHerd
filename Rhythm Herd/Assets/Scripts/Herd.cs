@@ -133,7 +133,7 @@ public class Herd : MonoBehaviour
     {
         int count = 0;
         LinkedListNode<HerdMember> member = members.First;
-        while (member != null && member.Next != null)
+        while (member != null)
         {
             count += member.Value.GetState() == HerdMember.MemberState.Joined ? 1 : 0;
             member = member.Next;

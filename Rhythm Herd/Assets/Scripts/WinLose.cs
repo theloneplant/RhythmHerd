@@ -16,7 +16,7 @@ public class WinLose : MonoBehaviour
 
     private void Update()
     {
-        if (!hasFinished)
+        if (!hasFinished && Time.frameCount > 4) // Magic number whatever it works
         {
             var location = new Vector2 { x = homeLocation.position.x, y = homeLocation.position.z, };
             var distance = Vector2.Distance(location, HerdMember.Target);
