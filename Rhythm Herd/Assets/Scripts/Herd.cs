@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Herd : MonoBehaviour
 {
     [SerializeField] private HerdMember memberPrefab = null;
-    [SerializeField] private GridFromChildren grid = null;
     [SerializeField] private HerdGatherer gatherer = null;
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private int memberCount = 6;
@@ -14,11 +12,8 @@ public class Herd : MonoBehaviour
 
     private LinkedList<HerdMember> members;
 
-    public static GridRaytracer Tracer { get; set; }
-
     private void Start()
     {
-        Tracer = new GridRaytracer(grid.Grid);
         members = new LinkedList<HerdMember>();
         for (int i = 0; i < memberCount; i++)
         {
