@@ -7,9 +7,10 @@ ModelImporter:
     400000: //RootNode
     2100000: Back
     2100002: Belly
-    2100004: Eye
+    2100004: Pupil
     2100006: Back Detail
     2100008: Belly Detail
+    2100010: Eye
     2300000: //RootNode
     3300000: //RootNode
     4300000: Meeple_NoLegs

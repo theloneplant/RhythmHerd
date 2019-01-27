@@ -8,6 +8,9 @@ public class HerdMember : MonoBehaviour
     [SerializeField] private float roamDistance = 1f;
     [SerializeField] private LayerMask mask;
     [SerializeField] private ParticleSystem particle;
+    [SerializeField] private Transform memberModel;
+    [SerializeField] private MeshRenderer question;
+    [SerializeField] private MeshRenderer exclamation;
 
     public enum MemberState
     {
@@ -25,6 +28,7 @@ public class HerdMember : MonoBehaviour
     private Vector2 startRoamPosition;
     private Vector2 targetRoamPosition;
     private float startDisoriented;
+    private Vector3 startLookAtOffset;
 
     public Vector2 Position
     {
@@ -42,11 +46,11 @@ public class HerdMember : MonoBehaviour
 
     private void Start()
     {
-        state = MemberState.Joined;
+        state = MemberState.Roam;
         currentFollowSpeed = followSpeed * Random.Range(1f - moveRandomization, 1f);
-        startDisoriented = Time.time;
-        particle.emissionRate = 0;
+        startDisoriented = Time.time - 10f;
         GameManager.OnBeat += UpdateTargetRoamPosition;
+        startLookAtOffset = memberModel.position - transform.position;
     }
 
     private void OnValidate()
@@ -58,18 +62,31 @@ public class HerdMember : MonoBehaviour
     {
         if (state == MemberState.Joined)
         {
+            question.enabled = false;
+            exclamation.enabled = false;
             UpdateCustom();
         }
         else
         {
+            if (state == MemberState.Rejoin)
+            {
+                question.enabled = false;
+                exclamation.enabled = true;
+            }
+            else
+            {
+                question.enabled = true;
+                exclamation.enabled = false;
+            }
             GoToTargetRoamPosition();
         }
 
-        if (state == MemberState.Rejoin && (Target - Position).magnitude <= roamDistance * 2f)
+        if (state == MemberState.Rejoin && (Target - Position).magnitude <= roamDistance * 3f)
         {
-            Debug.Log("wait for meee");
             SetState(MemberState.Joined);
         }
+
+        memberModel.LookAt(transform.position - new Vector3(direction.x, 0, direction.y));
     }
 
     private void UpdateCustom()
@@ -93,7 +110,7 @@ public class HerdMember : MonoBehaviour
 
     private void GoToTargetRoamPosition()
     {
-        Vector2 direction = targetRoamPosition - Position;
+        direction = targetRoamPosition - Position;
         Position += direction * Time.deltaTime * currentFollowSpeed;
     }
 
@@ -101,7 +118,7 @@ public class HerdMember : MonoBehaviour
     {
         if (state == MemberState.Rejoin)
         {
-            Vector2 direction = Target + Offset - Position;
+            direction = Target + Offset - Position;
             if (direction.magnitude < 1)
             {
                 targetRoamPosition = Position + direction;
@@ -121,9 +138,7 @@ public class HerdMember : MonoBehaviour
 
     public void Cheer()
     {
-        particle.Stop();
         particle.Emit(30);
-        particle.Play();
     }
 
     public bool IsDisoriented()
