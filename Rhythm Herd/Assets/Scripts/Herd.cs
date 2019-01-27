@@ -37,7 +37,7 @@ public class Herd : MonoBehaviour
 
     private void Update()
     {
-        //gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
+        gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
         Vector2 direction = InputDirection() * moveDistance;
         if (direction != Vector2.zero)
         {

@@ -138,7 +138,10 @@ public class HerdMember : MonoBehaviour
 
     public void Cheer()
     {
-        particle.Emit(30);
+        if (state == MemberState.Joined)
+        {
+            particle.Emit(30);
+        }
     }
 
     public bool IsDisoriented()
