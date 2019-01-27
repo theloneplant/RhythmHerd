@@ -3,27 +3,24 @@
 public class Herd : MonoBehaviour
 {
     [SerializeField] private HerdMember memberPrefab = null;
-    [SerializeField] private int memberCount = 6;
     [SerializeField] private GridFromChildren grid = null;
+    [SerializeField] private int memberCount = 6;
     [SerializeField] private float herdRadius = 1f;
-    [SerializeField] private float moveSpeed = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
 
     private HerdMember[] members;
 
-    private static float _followSpeed;
-    public static float FollowSpeed => 1f - 1f / (_followSpeed + 1f);
+    public static GridRaytracer Tracer { get; set; }
 
     private void Start()
     {
+        Tracer = new GridRaytracer(grid.Grid);
         members = new HerdMember[memberCount];
-        _followSpeed = moveSpeed;
         for (int i = 0; i < memberCount; i++)
         {
             members[i] = Instantiate(memberPrefab, transform);
         }
         members[0].GetComponent<MeshRenderer>().material.color = Color.red;
-        members[0].FollowModifier = 1f;
         for (int i = 1; i < memberCount; i++)
         {
             var offset = Vector2.zero;
@@ -32,6 +29,7 @@ public class Herd : MonoBehaviour
                 offset = Random.insideUnitCircle * herdRadius;
             }
             members[i].Offset = offset;
+            members[i].Position = offset;
         }
     }
 
@@ -40,8 +38,11 @@ public class Herd : MonoBehaviour
         Vector2Int direction = InputDirection();
         if (direction != Vector2Int.zero)
         {
-            //Leader.Move(InputDirection());
-            HerdMember.Target += direction;
+            var destination = HerdMember.Target + direction;
+            if (!grid.Grid.GetCell(destination))
+            {
+                HerdMember.Target += direction;
+            }
         }
     }
 
@@ -58,7 +59,6 @@ public class Herd : MonoBehaviour
 
     private void OnValidate()
     {
-        _followSpeed = moveSpeed;
         memberCount = memberCount > 0 ? memberCount : 1;
     }
 

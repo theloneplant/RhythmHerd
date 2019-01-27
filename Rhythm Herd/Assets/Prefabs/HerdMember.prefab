@@ -91,4 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveRandomization: 0.65
-  FollowModifier: 0
+  followSpeed: 12
+  mask:
+    serializedVersion: 2
+    m_Bits: 4
