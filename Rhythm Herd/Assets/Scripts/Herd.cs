@@ -3,7 +3,6 @@
 public class Herd : MonoBehaviour
 {
     [SerializeField] private HerdMember memberPrefab = null;
-    [SerializeField] private GridFromChildren grid = null;
     [SerializeField] private int memberCount = 6;
     [SerializeField] private float herdRadius = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
@@ -17,7 +16,6 @@ public class Herd : MonoBehaviour
 
     private void Start()
     {
-        Tracer = new GridRaytracer(grid.Grid);
         members = new HerdMember[memberCount];
         for (int i = 0; i < memberCount; i++)
         {
@@ -26,8 +24,9 @@ public class Herd : MonoBehaviour
         members[0].GetComponent<MeshRenderer>().material.color = Color.red;
         for (int i = 1; i < memberCount; i++)
         {
-            var offset = Vector2.zero;
-            while (ClosestMember(offset) < minimumSeparation)
+            Vector2 offset = Vector2.zero;
+            const int MAX_TRIES = 20;
+            for (int j = 0; j < MAX_TRIES && ClosestMember(offset) < minimumSeparation; j++)
             {
                 offset = Random.insideUnitCircle * herdRadius;
             }
@@ -38,12 +37,22 @@ public class Herd : MonoBehaviour
 
     private void Update()
     {
-        Vector2Int direction = InputDirection();
-        if (direction != Vector2Int.zero)
+        Vector2 direction = InputDirection();
+        if (direction != Vector2.zero)
         {
-            var destination = HerdMember.Target + direction;
-            if (!grid.Grid.GetCell(destination))
+            var direction3D = new Vector3 { x = direction.x, z = direction.y, };
+            var origin = new Vector3 { x = HerdMember.Target.x, z = HerdMember.Target.y, };
+            var ray = new Ray(origin, direction3D);
+            bool found = Physics.Raycast(ray, out RaycastHit hit, direction3D.magnitude);
+            if (found)
             {
+                Debug.Log("Hit");
+                Vector3 position = hit.point - direction3D.normalized * 0.05f;
+                HerdMember.Target = new Vector2 { x = position.x, y = position.z, };
+            }
+            else
+            {
+                Debug.Log("Not hit.");
                 HerdMember.Target += direction;
             }
             OnMove?.Invoke();
@@ -66,24 +75,24 @@ public class Herd : MonoBehaviour
         memberCount = memberCount > 0 ? memberCount : 1;
     }
 
-    private Vector2Int InputDirection()
+    private Vector2 InputDirection()
     {
         if (Input.GetButtonDown("Up"))
         {
-            return Vector2Int.up;
+            return Vector2.up;
         }
         else if (Input.GetButtonDown("Down"))
         {
-            return Vector2Int.down;
+            return Vector2.down;
         }
         else if (Input.GetButtonDown("Left"))
         {
-            return Vector2Int.left;
+            return Vector2.left;
         }
         else if (Input.GetButtonDown("Right"))
         {
-            return Vector2Int.right;
+            return Vector2.right;
         }
-        return Vector2Int.zero;
+        return Vector2.zero;
     }
 }

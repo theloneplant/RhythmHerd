@@ -9,7 +9,7 @@ public class HerdMember : MonoBehaviour
 
     public Vector2 Offset { get; set; }
 
-    public static Vector2Int Target { get; set; }
+    public static Vector2 Target { get; set; }
 
     private Vector2 direction;
 
@@ -39,38 +39,27 @@ public class HerdMember : MonoBehaviour
 
     private void Update()
     {
-        UpdateCustom();        
+        UpdateCustom();
     }
 
     private void UpdateCustom()
     {
         direction = Target + Offset - Position;
         direction = direction.magnitude > 1f ? direction.normalized : direction;
-        Vector2 destination, normal;
-        if (Herd.Tracer.Trace(Position, direction * Time.deltaTime * followSpeed, out destination, out normal))
+        var direction3D = new Vector3 { x = direction.x, z = direction.y, };
+        var ray = new Ray(transform.position, direction3D);
+        bool found = Physics.Raycast(ray, out RaycastHit hit, direction3D.magnitude * Time.deltaTime * followSpeed);
+        if (found)
         {
-            Position = destination;
-            var perp = Vector2.Perpendicular(normal);
-            Position += perp * Vector2.Dot(perp, direction) * Time.deltaTime * followSpeed;
-            Debug.DrawLine(transform.position, transform.position + new Vector3 { x = normal.x, z = normal.y, }, Color.red);
+            transform.position = hit.point - direction3D.normalized * 0.05f;
+            var perpendicular = Vector3.Cross(Vector3.up, hit.normal);
+            transform.position += perpendicular * Vector3.Dot(perpendicular, direction3D) * Time.deltaTime * followSpeed;
         }
         else
         {
             Position += direction * Time.deltaTime * followSpeed;
         }
     }
-
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            var velocity3 = new Vector3 { x = direction.x, z = direction.y };
-            UnityEditor.Handles.color = Color.red;
-            //UnityEditor.Handles.DrawLine(transform.position, transform.position + velocity3);
-        }
-    }
-#endif
 
     public void Kill()
     {
