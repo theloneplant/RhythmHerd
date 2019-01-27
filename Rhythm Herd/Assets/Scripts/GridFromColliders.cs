@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class GridFromChildren : GridGenerator
+public class GridFromColliders : GridGenerator
 {
     private void Awake()
     {
@@ -11,16 +11,17 @@ public class GridFromChildren : GridGenerator
             min = new Vector2Int { x = 100000, y = 100000 },
             max = new Vector2Int { x = -100000, y = -100000 },
         };
-        foreach (Transform child in transform)
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders)
         {
-            var position3 = child.position;
-            var position = new Vector2Int { x = (int)position3.x, y = (int)position3.z, }; 
+            Vector3 position3 = collider.transform.position;
+            var position = new Vector2Int { x = (int)position3.x, y = (int)position3.z, };
             bounds.min = Vector2Int.Min(bounds.min, position);
             bounds.max = Vector2Int.Max(bounds.max, position);
             positions.Add(position);
         }
         Grid = new WorldGrid(bounds);
-        foreach (var position in positions)
+        foreach (Vector2Int position in positions)
         {
             Grid.SetCell(true, position);
         }

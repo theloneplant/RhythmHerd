@@ -27,8 +27,9 @@ public class Herd : MonoBehaviour
         }
         foreach (HerdMember member in members)
         {
-            var offset = Vector2.zero;
-            while (ClosestMember(offset) < minimumSeparation)
+            Vector2 offset = Vector2.zero;
+            const int MAX_TRIES = 20;
+            for (int j = 0; j < MAX_TRIES && ClosestMember(offset) < minimumSeparation; j++)
             {
                 offset = Random.insideUnitCircle * herdRadius;
             }
@@ -40,13 +41,23 @@ public class Herd : MonoBehaviour
     private void Update()
     {
         gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
-        Vector2Int direction = InputDirection();
-        if (direction != Vector2Int.zero)
+        Vector2 direction = InputDirection();
+        if (direction != Vector2.zero)
         {
             DropMembers();
-            var destination = HerdMember.Target + direction;
-            if (!grid.Grid.GetCell(destination))
+            var direction3D = new Vector3 { x = direction.x, z = direction.y, };
+            var origin = new Vector3 { x = HerdMember.Target.x, z = HerdMember.Target.y, };
+            var ray = new Ray(origin, direction3D);
+            bool found = Physics.Raycast(ray, out RaycastHit hit, direction3D.magnitude);
+            if (found)
             {
+                Debug.Log("Hit");
+                Vector3 position = hit.point - direction3D.normalized * 0.05f;
+                HerdMember.Target = new Vector2 { x = position.x, y = position.z, };
+            }
+            else
+            {
+                Debug.Log("Not hit.");
                 HerdMember.Target += direction;
             }
         }
@@ -89,24 +100,24 @@ public class Herd : MonoBehaviour
         members.AddFirst(newMember);
     }
 
-    private Vector2Int InputDirection()
+    private Vector2 InputDirection()
     {
         if (Input.GetButtonDown("Up"))
         {
-            return Vector2Int.up;
+            return Vector2.up;
         }
         else if (Input.GetButtonDown("Down"))
         {
-            return Vector2Int.down;
+            return Vector2.down;
         }
         else if (Input.GetButtonDown("Left"))
         {
-            return Vector2Int.left;
+            return Vector2.left;
         }
         else if (Input.GetButtonDown("Right"))
         {
-            return Vector2Int.right;
+            return Vector2.right;
         }
-        return Vector2Int.zero;
+        return Vector2.zero;
     }
 }
