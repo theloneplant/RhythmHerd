@@ -11,6 +11,11 @@ public class Jump : MonoBehaviour
         GameManager.OnBeat += JumpOnBeat;
     }
 
+    private void OnDestroy()
+    {
+        GameManager.OnBeat -= JumpOnBeat;
+    }
+
     private void JumpOnBeat()
     {
         StartCoroutine(JumpOnBeatCoroutine());
