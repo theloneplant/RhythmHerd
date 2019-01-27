@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Herd : MonoBehaviour
 {
     [SerializeField] private HerdMember memberPrefab = null;
-    [SerializeField] private GridFromChildren grid = null;
     [SerializeField] private HerdGatherer gatherer = null;
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private int memberCount = 6;
@@ -14,11 +12,8 @@ public class Herd : MonoBehaviour
 
     private LinkedList<HerdMember> members;
 
-    public static GridRaytracer Tracer { get; set; }
-
     private void Start()
     {
-        Tracer = new GridRaytracer(grid.Grid);
         members = new LinkedList<HerdMember>();
         for (int i = 0; i < memberCount; i++)
         {
@@ -103,8 +98,11 @@ public class Herd : MonoBehaviour
         }
         else if (score < 0.75f)
         {
-            members.Last.Value.SetState(HerdMember.MemberState.Roam);
-            members.RemoveLast();
+            members.Last?.Value?.SetState(HerdMember.MemberState.Roam);
+            if (members.Count > 0)
+            {
+                members.RemoveLast();
+            }
         }
     }
 
@@ -113,9 +111,9 @@ public class Herd : MonoBehaviour
         LinkedListNode<HerdMember> currentMember = members.First;
         for (int i = 0; i <= numberOfCheers; i++)
         {
-            HerdMember member = currentMember.Value;
-            member.Cheer();
-            currentMember = currentMember.Next;
+            HerdMember member = currentMember?.Value;
+            member?.Cheer();
+            currentMember = currentMember?.Next;
         }
     }
 
@@ -123,6 +121,18 @@ public class Herd : MonoBehaviour
     {
         newMember.SetState(HerdMember.MemberState.Roam);
         members.AddFirst(newMember);
+    }
+
+    public int JoinedCount()
+    {
+        int count = 0;
+        LinkedListNode<HerdMember> member = members.First;
+        while (member != null && member.Next != null)
+        {
+            count += member.Value.GetState() == HerdMember.MemberState.Joined ? 1 : 0;
+            member = member.Next;
+        }
+        return count;
     }
 
     private Vector2 InputDirection()
