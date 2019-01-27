@@ -6,11 +6,17 @@ public class HerdMember : MonoBehaviour
     [SerializeField] private float moveRandomization = 0.5f;
     [SerializeField] private float followSpeed = 1f;
     [SerializeField] private float roamDistance = 1f;
+    [SerializeField] private float cheerChance = 0.2f;
+    [SerializeField] private float lowChance = 0.2f;
     [SerializeField] private LayerMask mask;
     [SerializeField] private ParticleSystem particle;
     [SerializeField] private Transform memberModel;
     [SerializeField] private MeshRenderer question;
     [SerializeField] private MeshRenderer exclamation;
+    [SerializeField] private AudioClip ow;
+    [SerializeField] private AudioClip owLow;
+    [SerializeField] private AudioClip cheer;
+    [SerializeField] private AudioClip cheerLow;
 
     public enum MemberState
     {
@@ -46,7 +52,7 @@ public class HerdMember : MonoBehaviour
 
     private void Start()
     {
-        state = MemberState.Roam;
+        state = MemberState.Joined;
         currentFollowSpeed = followSpeed * Random.Range(1f - moveRandomization, 1f);
         startDisoriented = Time.time - 10f;
         GameManager.OnBeat += UpdateTargetRoamPosition;
@@ -140,7 +146,33 @@ public class HerdMember : MonoBehaviour
     {
         if (state == MemberState.Joined)
         {
+            if (isVocal())
+            {
+                if (isLow())
+                {
+                    GameManager.PlaySound(cheer, 1.2f, true, 0.2f);
+                }
+                else
+                {
+                    GameManager.PlaySound(cheerLow, 0.7f, true, 0.2f);
+                }
+            }
             particle.Emit(30);
+        }
+    }
+
+    public void Leave()
+    {
+        if (isVocal())
+        {
+            if (isLow())
+            {
+                GameManager.PlaySound(ow, 1.5f, true, 0.2f);
+            }
+            else
+            {
+                GameManager.PlaySound(owLow, 0.7f, true, 0.2f);
+            }
         }
     }
 
@@ -158,6 +190,16 @@ public class HerdMember : MonoBehaviour
             startRoamPosition = Position;
             UpdateTargetRoamPosition();
         }
+    }
+
+    private bool isVocal()
+    {
+        return Random.Range(0, 1) < cheerChance;
+    }
+
+    private bool isLow()
+    {
+        return Random.Range(0, 1) < lowChance;
     }
 
     public MemberState GetState()

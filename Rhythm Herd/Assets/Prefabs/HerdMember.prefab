@@ -52,6 +52,8 @@ MonoBehaviour:
   moveRandomization: 0.65
   followSpeed: 12
   roamDistance: 1
+  cheerChance: 0.7
+  lowChance: 0.4
   mask:
     serializedVersion: 2
     m_Bits: 4
@@ -59,6 +61,10 @@ MonoBehaviour:
   memberModel: {fileID: 7024681561500226394}
   question: {fileID: 3799183384464849093}
   exclamation: {fileID: 5822218486535335987}
+  ow: {fileID: 8300000, guid: 9d6891d1f7edf4b29aa8eab166e0d7a1, type: 3}
+  owLow: {fileID: 8300000, guid: ac14fd2b8e778408988dc8519be0bd01, type: 3}
+  cheer: {fileID: 8300000, guid: f8263776088f24477afb1faa04be9daf, type: 3}
+  cheerLow: {fileID: 8300000, guid: bd2d96a79ae7f41288c5579f7c786483, type: 3}
 --- !u!114 &7180184376672039547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -355,6 +361,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 49.999985
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 46ed6f5ec3bab48bd804b9bc8da865b6, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: aa85280bd542f40f8a78345841b5b6e4, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46ed6f5ec3bab48bd804b9bc8da865b6, type: 3}
 --- !u!4 &8551147337745432114 stripped

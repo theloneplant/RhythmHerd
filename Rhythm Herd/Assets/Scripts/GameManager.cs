@@ -41,7 +41,8 @@ public class GameManager : MonoBehaviour
         controller = GetComponent<Herd>();
         startTime = Time.time;
         beatInterval = 60.0f / bpm;
-        previousBeat = startTime + offset - beatInterval;
+        previousBeat = startTime - beatInterval;
+        music.time = offset;
         music.Play();
     }
 
@@ -75,24 +76,23 @@ public class GameManager : MonoBehaviour
 
     public float getNextBeatTime(float numberOfBeatsAhead = 1)
     {
-        float elapsed = Time.time - startTime + offset;
+        float elapsed = Time.time - startTime;
         return elapsed + (beatInterval * numberOfBeatsAhead) - (elapsed % beatInterval);
     }
 
     public float getBeatScore()
     {
-        float elapsed = Time.time - startTime + offset;
+        float elapsed = Time.time - startTime;
         float beatPosition = elapsed % beatInterval;
         float center = beatInterval / 2.0f;
         return (Mathf.Abs(beatPosition - center) / beatInterval) * 2;
     }
 
-    public static void PlaySound(AudioClip source, bool randomPitch = false, float volume = 0.5f)
+    public static void PlaySound(AudioClip source, float pitch = 1f, bool randomPitch = false, float volume = 0.5f)
     {
-        float pitch = 1;
         if (randomPitch)
         {
-            pitch = Random.Range(0.9f, 1.1f);
+            pitch *= Random.Range(0.9f, 1.1f);
         }
         GameObject sound = Instantiate(instance.soundPrefab, Vector3.zero, Quaternion.identity);
         AudioSource audio = sound.GetComponent<AudioSource>();

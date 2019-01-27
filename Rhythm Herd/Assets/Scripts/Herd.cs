@@ -97,11 +97,12 @@ public class Herd : MonoBehaviour
                 Cheer(1);
             }
         }
-        else if (score < 0.75f)
+        else if (score < 0.72f)
         {
             members.Last?.Value.SetState(HerdMember.MemberState.Roam);
             if (members.Count > 0)
             {
+                members.Last.Value.Leave();
                 members.RemoveLast();
             }
         }
