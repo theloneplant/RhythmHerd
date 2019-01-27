@@ -8,6 +8,9 @@ public class Herd : MonoBehaviour
     [SerializeField] private float herdRadius = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
 
+    public delegate void MoveAction();
+    public static event MoveAction OnMove;
+
     private HerdMember[] members;
 
     public static GridRaytracer Tracer { get; set; }
@@ -43,6 +46,7 @@ public class Herd : MonoBehaviour
             {
                 HerdMember.Target += direction;
             }
+            OnMove?.Invoke();
         }
     }
 
