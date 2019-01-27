@@ -7,8 +7,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CameraController camera;
     [SerializeField] private Herd controller;
     [SerializeField] private GameObject barPrefab;
-    [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject barTarget;
+    [SerializeField] private AudioSource music;
     [SerializeField] private float offset;
     [SerializeField] private int bpm;
 
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour
         startTime = Time.time;
         beatInterval = 60.0f / bpm;
         previousBeat = startTime + offset - beatInterval;
+        music.Play();
     }
 
     // Update is called once per frame

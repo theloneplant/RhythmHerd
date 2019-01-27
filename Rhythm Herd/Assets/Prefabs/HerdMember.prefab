@@ -12,9 +12,11 @@ GameObject:
   - component: {fileID: 1256215479884588022}
   - component: {fileID: 1256215479884588023}
   - component: {fileID: 1256215479884588016}
+  - component: {fileID: 7180184376672039547}
+  - component: {fileID: 5411790301947136566}
   m_Layer: 0
   m_Name: HerdMember
-  m_TagString: Untagged
+  m_TagString: HerdMember
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 1256215479884588018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -92,6 +94,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveRandomization: 0.65
   followSpeed: 12
+  roamDistance: 1
   mask:
     serializedVersion: 2
     m_Bits: 4
+--- !u!114 &7180184376672039547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256215479884588018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33387e868ddfcfb49b920b2cefc610db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpDuration: 0.3
+  height: 0.8
+--- !u!135 &5411790301947136566
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256215479884588018}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}

@@ -1,52 +1,54 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class Herd : MonoBehaviour
 {
     [SerializeField] private HerdMember memberPrefab = null;
     [SerializeField] private GridFromChildren grid = null;
+    [SerializeField] private HerdGatherer gatherer = null;
     [SerializeField] private int memberCount = 6;
     [SerializeField] private float herdRadius = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
 
-    public delegate void MoveAction();
-    public static event MoveAction OnMove;
-
-    private HerdMember[] members;
+    private LinkedList<HerdMember> members;
 
     public static GridRaytracer Tracer { get; set; }
 
     private void Start()
     {
         Tracer = new GridRaytracer(grid.Grid);
-        members = new HerdMember[memberCount];
+        members = new LinkedList<HerdMember>();
         for (int i = 0; i < memberCount; i++)
         {
-            members[i] = Instantiate(memberPrefab, transform);
+            HerdMember member = Instantiate(memberPrefab, transform);
+            members.AddLast(member);
+            member.setState(HerdMember.MemberState.Joined);
         }
-        members[0].GetComponent<MeshRenderer>().material.color = Color.red;
-        for (int i = 1; i < memberCount; i++)
+        foreach (HerdMember member in members)
         {
             var offset = Vector2.zero;
             while (ClosestMember(offset) < minimumSeparation)
             {
                 offset = Random.insideUnitCircle * herdRadius;
             }
-            members[i].Offset = offset;
-            members[i].Position = offset;
+            member.Offset = offset;
+            member.Position = offset;
         }
     }
 
     private void Update()
     {
+        gatherer.transform.position = new Vector3(HerdMember.Target.x, 0, HerdMember.Target.y);
         Vector2Int direction = InputDirection();
         if (direction != Vector2Int.zero)
         {
+            DropMembers();
             var destination = HerdMember.Target + direction;
             if (!grid.Grid.GetCell(destination))
             {
                 HerdMember.Target += direction;
             }
-            OnMove?.Invoke();
         }
     }
 
@@ -64,6 +66,27 @@ public class Herd : MonoBehaviour
     private void OnValidate()
     {
         memberCount = memberCount > 0 ? memberCount : 1;
+    }
+
+    private void DropMembers()
+    {
+        float score = GameManager.instance.getBeatScore();
+        if (score > 0.9f)
+        {
+            // Cheer
+        }
+        else if (score < 0.75f)
+        {
+            Debug.Log("removing");
+            members.Last.Value.setState(HerdMember.MemberState.Roam);
+            members.RemoveLast();
+        }
+    }
+
+    public void AddMember(HerdMember newMember)
+    {
+        newMember.setState(HerdMember.MemberState.Roam);
+        members.AddFirst(newMember);
     }
 
     private Vector2Int InputDirection()
