@@ -98,7 +98,7 @@ public class Herd : MonoBehaviour
         }
         else if (score < 0.75f)
         {
-            members.Last?.Value?.SetState(HerdMember.MemberState.Roam);
+            members.Last?.Value.SetState(HerdMember.MemberState.Roam);
             if (members.Count > 0)
             {
                 members.RemoveLast();
@@ -115,6 +115,11 @@ public class Herd : MonoBehaviour
             member?.Cheer();
             currentMember = currentMember?.Next;
         }
+    }
+
+    public void CheerAll()
+    {
+        Cheer(members.Count);
     }
 
     public void AddMember(HerdMember newMember)
