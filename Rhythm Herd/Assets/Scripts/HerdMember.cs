@@ -45,6 +45,7 @@ public class HerdMember : MonoBehaviour
     private void UpdateCustom()
     {
         direction = Target + Offset - Position;
+        direction = direction.magnitude > 1f ? direction.normalized : direction;
         Vector2 destination, normal;
         if (Herd.Tracer.Trace(Position, direction * Time.deltaTime * followSpeed, out destination, out normal))
         {
