@@ -54,7 +54,7 @@
 				float inner = 1 - (1 - distance - _Thickness) / _AntialiasWidth;
 				float outer = (1 - distance) / _AntialiasWidth;
 				float circle = clamp(outer, 0, 1) * clamp(inner, 0, 1);
-				return float4(1, 1, 1, outer) * lerp(_InnerColor, _Color, clamp(inner, 0, 1));
+				return float4(1, 1, 1, clamp(outer, 0, 1)) * lerp(_InnerColor, _Color, clamp(inner, 0, 1));
             }
             ENDCG
         }

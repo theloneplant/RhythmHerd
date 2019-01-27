@@ -23,4 +23,9 @@ public class BeatCircle : MonoBehaviour
         score *= score;
         circleMaterial.SetFloat(Constants.radius, 1f - score);
     }
+
+    private void OnDestroy()
+    {
+        circleMaterial.SetFloat(Constants.radius, 1f);
+    }
 }
