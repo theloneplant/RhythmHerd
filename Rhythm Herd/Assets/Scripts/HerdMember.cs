@@ -67,6 +67,7 @@ public class HerdMember : MonoBehaviour
 
         if (state == MemberState.Rejoin && (Target - Position).magnitude <= roamDistance * 2f)
         {
+            Debug.Log("wait for meee");
             SetState(MemberState.Joined);
         }
     }
@@ -120,7 +121,6 @@ public class HerdMember : MonoBehaviour
 
     public void Cheer()
     {
-        Debug.Log("Cheer!");
         particle.Stop();
         particle.Emit(30);
         particle.Play();

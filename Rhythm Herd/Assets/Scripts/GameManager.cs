@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private CameraController camera;
     [SerializeField] private Herd controller;
+    [SerializeField] private GameObject soundPrefab;
     [SerializeField] private GameObject barPrefab;
     [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject barTarget;
@@ -85,6 +86,22 @@ public class GameManager : MonoBehaviour
         float center = beatInterval / 2.0f;
         return (Mathf.Abs(beatPosition - center) / beatInterval) * 2;
     }
+
+    public static void PlaySound(AudioClip source, bool randomPitch = false, float volume = 0.5f)
+    {
+        float pitch = 1;
+        if (randomPitch)
+        {
+            pitch = Random.Range(0.9f, 1.1f);
+        }
+        GameObject sound = Instantiate(instance.soundPrefab, Vector3.zero, Quaternion.identity);
+        AudioSource audio = sound.GetComponent<AudioSource>();
+        audio.clip = source;
+        audio.volume = volume;
+        audio.pitch = pitch;
+        audio.Play();
+    }
+
 
     public GameObject getBarTarget()
     {
