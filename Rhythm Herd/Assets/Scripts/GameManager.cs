@@ -6,9 +6,11 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private CameraController camera;
     [SerializeField] private Herd controller;
+    [SerializeField] private GameObject soundPrefab;
     [SerializeField] private GameObject barPrefab;
-    [SerializeField] private Canvas canvas;
+    [SerializeField] private GameObject canvas;
     [SerializeField] private GameObject barTarget;
+    [SerializeField] private AudioSource music;
     [SerializeField] private float offset;
     [SerializeField] private int bpm;
 
@@ -40,6 +42,7 @@ public class GameManager : MonoBehaviour
         startTime = Time.time;
         beatInterval = 60.0f / bpm;
         previousBeat = startTime + offset - beatInterval;
+        music.Play();
     }
 
     // Update is called once per frame
@@ -49,7 +52,6 @@ public class GameManager : MonoBehaviour
         if (Time.time - previousBeat >= beatInterval)
         {
             playBeat();
-            Debug.Log(previousBeat + " - " + Time.time);
             previousBeat = getNextBeatTime() - beatInterval;
         }
     }
@@ -84,6 +86,22 @@ public class GameManager : MonoBehaviour
         float center = beatInterval / 2.0f;
         return (Mathf.Abs(beatPosition - center) / beatInterval) * 2;
     }
+
+    public static void PlaySound(AudioClip source, bool randomPitch = false, float volume = 0.5f)
+    {
+        float pitch = 1;
+        if (randomPitch)
+        {
+            pitch = Random.Range(0.9f, 1.1f);
+        }
+        GameObject sound = Instantiate(instance.soundPrefab, Vector3.zero, Quaternion.identity);
+        AudioSource audio = sound.GetComponent<AudioSource>();
+        audio.clip = source;
+        audio.volume = volume;
+        audio.pitch = pitch;
+        audio.Play();
+    }
+
 
     public GameObject getBarTarget()
     {

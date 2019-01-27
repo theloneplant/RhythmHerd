@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BeatBounce : MonoBehaviour {
-    [SerializeField] private float power;
-    [SerializeField] private float multiplier;
+    [SerializeField] private float power = 4;
+    [SerializeField] private float multiplier = -0.3f;
 
     private GameManager manager;
     private Vector3 localScale;

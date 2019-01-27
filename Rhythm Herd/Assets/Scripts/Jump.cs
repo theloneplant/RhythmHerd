@@ -8,13 +8,11 @@ public class Jump : MonoBehaviour
 
     private void Start()
     {
-        //GameManager.OnBeat += JumpOnBeat;
-        Herd.OnMove += JumpOnBeat;
+        GameManager.OnBeat += JumpOnBeat;
     }
 
     private void JumpOnBeat()
     {
-        Debug.Log("Stuff");
         StartCoroutine(JumpOnBeatCoroutine());
     }
 
