@@ -18,15 +18,13 @@ public class HerdGatherer : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        Debug.Log("entered");
         HerdMember member = other.gameObject.GetComponent<HerdMember>();
         if (member != null && member.GetState() == HerdMember.MemberState.Roam && !member.IsDisoriented())
         {
-            Debug.Log("is member, adding to list");
             herd.AddMember(member);
-            member.setState(HerdMember.MemberState.Rejoin);
+            member.SetState(HerdMember.MemberState.Rejoin);
         }
     }
 }

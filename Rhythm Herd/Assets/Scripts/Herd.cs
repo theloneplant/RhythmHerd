@@ -7,6 +7,7 @@ public class Herd : MonoBehaviour
     [SerializeField] private HerdMember memberPrefab = null;
     [SerializeField] private GridFromChildren grid = null;
     [SerializeField] private HerdGatherer gatherer = null;
+    [SerializeField] private LayerMask layerMask;
     [SerializeField] private int memberCount = 6;
     [SerializeField] private float herdRadius = 1f;
     [SerializeField] private float minimumSeparation = 0.1f;
@@ -23,7 +24,7 @@ public class Herd : MonoBehaviour
         {
             HerdMember member = Instantiate(memberPrefab, transform);
             members.AddLast(member);
-            member.setState(HerdMember.MemberState.Joined);
+            member.SetState(HerdMember.MemberState.Joined);
         }
         foreach (HerdMember member in members)
         {
@@ -48,16 +49,15 @@ public class Herd : MonoBehaviour
             var direction3D = new Vector3 { x = direction.x, z = direction.y, };
             var origin = new Vector3 { x = HerdMember.Target.x, z = HerdMember.Target.y, };
             var ray = new Ray(origin, direction3D);
-            bool found = Physics.Raycast(ray, out RaycastHit hit, direction3D.magnitude);
+            bool found = Physics.Raycast(ray, out RaycastHit hit, direction3D.magnitude, layerMask);
             if (found)
             {
-                Debug.Log("Hit");
+                Debug.Log("Hit - " + Time.time);
                 Vector3 position = hit.point - direction3D.normalized * 0.05f;
                 HerdMember.Target = new Vector2 { x = position.x, y = position.z, };
             }
             else
             {
-                Debug.Log("Not hit.");
                 HerdMember.Target += direction;
             }
         }
@@ -84,19 +84,44 @@ public class Herd : MonoBehaviour
         float score = GameManager.instance.getBeatScore();
         if (score > 0.9f)
         {
-            // Cheer
+            if (score > 0.98)
+            {
+                Cheer(5);
+            }
+            else if (score > 0.95)
+            {
+                Cheer(3);
+            }
+            else if (score > 0.93)
+            {
+                Cheer(2);
+            }
+            else
+            {
+                Cheer(1);
+            }
         }
         else if (score < 0.75f)
         {
-            Debug.Log("removing");
-            members.Last.Value.setState(HerdMember.MemberState.Roam);
+            members.Last.Value.SetState(HerdMember.MemberState.Roam);
             members.RemoveLast();
+        }
+    }
+
+    private void Cheer(int numberOfCheers)
+    {
+        LinkedListNode<HerdMember> currentMember = members.First;
+        for (int i = 0; i <= numberOfCheers; i++)
+        {
+            HerdMember member = currentMember.Value;
+            member.Cheer();
+            currentMember = currentMember.Next;
         }
     }
 
     public void AddMember(HerdMember newMember)
     {
-        newMember.setState(HerdMember.MemberState.Roam);
+        newMember.SetState(HerdMember.MemberState.Roam);
         members.AddFirst(newMember);
     }
 

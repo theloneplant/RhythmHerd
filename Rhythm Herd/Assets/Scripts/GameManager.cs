@@ -51,7 +51,6 @@ public class GameManager : MonoBehaviour
         if (Time.time - previousBeat >= beatInterval)
         {
             playBeat();
-            Debug.Log(previousBeat + " - " + Time.time);
             previousBeat = getNextBeatTime() - beatInterval;
         }
     }

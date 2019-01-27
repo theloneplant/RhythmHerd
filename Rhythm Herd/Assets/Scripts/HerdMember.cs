@@ -7,6 +7,7 @@ public class HerdMember : MonoBehaviour
     [SerializeField] private float followSpeed = 1f;
     [SerializeField] private float roamDistance = 1f;
     [SerializeField] private LayerMask mask;
+    [SerializeField] private ParticleSystem particle;
 
     public enum MemberState
     {
@@ -21,8 +22,8 @@ public class HerdMember : MonoBehaviour
     private Vector2 direction;
     private float currentFollowSpeed;
 
-    private Vector2 startDisorientedPosition;
-    private Vector2 targetDisorientedPosition;
+    private Vector2 startRoamPosition;
+    private Vector2 targetRoamPosition;
     private float startDisoriented;
 
     public Vector2 Position
@@ -44,7 +45,8 @@ public class HerdMember : MonoBehaviour
         state = MemberState.Joined;
         currentFollowSpeed = followSpeed * Random.Range(1f - moveRandomization, 1f);
         startDisoriented = Time.time;
-        GameManager.OnBeat += updateTargetDisorientedPosition;
+        particle.emissionRate = 0;
+        GameManager.OnBeat += UpdateTargetRoamPosition;
     }
 
     private void OnValidate()
@@ -58,13 +60,14 @@ public class HerdMember : MonoBehaviour
         {
             UpdateCustom();
         }
-        else if (state == MemberState.Rejoin)
-        {
-
-        }
         else
         {
-            Roam();
+            GoToTargetRoamPosition();
+        }
+
+        if (state == MemberState.Rejoin && (Target - Position).magnitude <= roamDistance * 2f)
+        {
+            SetState(MemberState.Joined);
         }
     }
 
@@ -87,35 +90,56 @@ public class HerdMember : MonoBehaviour
         }
     }
 
-    private void Roam()
+    private void GoToTargetRoamPosition()
     {
-        Vector2 direction = targetDisorientedPosition - Position;
+        Vector2 direction = targetRoamPosition - Position;
         Position += direction * Time.deltaTime * currentFollowSpeed;
     }
 
-    private void updateTargetDisorientedPosition()
+    private void UpdateTargetRoamPosition()
     {
-        float x = Random.Range(startDisorientedPosition.x - roamDistance, startDisorientedPosition.x + roamDistance);
-        float y = Random.Range(startDisorientedPosition.y - roamDistance, startDisorientedPosition.y + roamDistance);
-        targetDisorientedPosition = new Vector2(x, y);
+        if (state == MemberState.Rejoin)
+        {
+            Vector2 direction = Target + Offset - Position;
+            if (direction.magnitude < 1)
+            {
+                targetRoamPosition = Position + direction;
+            }
+            else
+            {
+                targetRoamPosition = Position + direction.normalized * roamDistance;
+            }
+        }
+        else if (state == MemberState.Roam)
+        {
+            float x = Random.Range(startRoamPosition.x - roamDistance, startRoamPosition.x + roamDistance);
+            float y = Random.Range(startRoamPosition.y - roamDistance, startRoamPosition.y + roamDistance);
+            targetRoamPosition = new Vector2(x, y);
+        }
     }
 
-    public void setState(MemberState newState)
+    public void Cheer()
     {
-        state = newState;
-        if (state == MemberState.Roam)
-        {
-            Debug.Log("not member");
-            startDisoriented = Time.time;
-            startDisorientedPosition = Position;
-            updateTargetDisorientedPosition();
-        }
+        Debug.Log("Cheer!");
+        particle.Stop();
+        particle.Emit(30);
+        particle.Play();
     }
 
     public bool IsDisoriented()
     {
-        Debug.Log("disoriented: " + (Time.time - startDisoriented < 10f));
         return (Time.time - startDisoriented) < 10f;
+    }
+
+    public void SetState(MemberState newState)
+    {
+        state = newState;
+        if (state == MemberState.Roam)
+        {
+            startDisoriented = Time.time;
+            startRoamPosition = Position;
+            UpdateTargetRoamPosition();
+        }
     }
 
     public MemberState GetState()
